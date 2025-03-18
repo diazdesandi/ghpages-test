@@ -1,0 +1,1 @@
+export type Target = 'csv1' | 'csv2';
