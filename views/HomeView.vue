@@ -20,6 +20,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card"
 import { XIcon } from "lucide-vue-next";
+import ComparisonOptions from '@/components/common/ComparisonOptions.vue'
+import { ArrowRight } from 'lucide-vue-next';
 
 const store = useStore();
 const { tabs, activeTabId, activeTab, addTab, setActiveTab, addResultsTab, removeTab } = useTabs();
@@ -74,45 +76,23 @@ const handleCompare = () => {
 <template>
   <div class="min-h-screen bg-gray-100/40 p-8">
     <div class="flex flex-col gap-6">
-      <!-- File Upload Card -->
-      <Card>
-        <CardContent class="p-6">
-          <div class="flex flex-col gap-4">
-            <h2 class="text-lg font-bold">Upload CSV Files</h2>
-            <FileHandler target="csv1" />
-          </div>
-        </CardContent>
-      </Card>
+      <!-- File Upload and Comparison Options Row -->
+      <div class="flex gap-4">
+        <!-- File Upload Card -->
+        <Card class="w-[300px]">
+          <CardContent class="p-4">
+            <div class="flex flex-col gap-2">
+              <h2 class="text-sm font-medium">Upload CSV Files</h2>
+              <FileHandler target="csv1" />
+            </div>
+          </CardContent>
+        </Card>
 
-      <!-- Comparison Controls Card -->
-      <Card v-if="tabs.length === 2">
-        <CardContent class="p-6">
-          <div class="flex items-center gap-4">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline">Select CSV to Compare</Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuLabel>Select CSVs</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  v-for="tab1 in tabs"
-                  :key="tab1.id"
-                  @click="store.setSelectedTargets(tab1.target, tabs.find(t => t.id !== tab1.id)?.target ?? null)"
-                >
-                  {{ tab1.name }} vs {{ tabs.find((t) => t.id !== tab1.id)?.name }}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <Button 
-              @click="handleCompare" 
-              :disabled="!store.selectedTargets.target1 || !store.selectedTargets.target2"
-            >
-              Compare
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+        <!-- Comparison Options -->
+        <div class="flex-1">
+          <ComparisonOptions />
+        </div>
+      </div>
 
       <!-- Tabs Card -->
       <Card v-if="tabs.length > 0">
