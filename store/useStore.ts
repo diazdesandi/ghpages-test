@@ -6,12 +6,25 @@ import type { Target } from '@/interfaces/csv.interface';
 interface StoreState {
   csv1: string | null;
   csv2: string | null;
+  comparisonInfo: {
+    target1: Target | null;
+    target2: Target | null;
+  } | null;
+  selectedTargets: {
+    target1: Target | null;
+    target2: Target | null;
+  };
 }
 
 export const useStore = defineStore('store', {
   state: (): StoreState => ({
     csv1: null,
-    csv2: null
+    csv2: null,
+    comparisonInfo: null,
+    selectedTargets: {
+      target1: null,
+      target2: null,
+    },
   }),
   
   actions: {
@@ -73,15 +86,20 @@ export const useStore = defineStore('store', {
     
     /**
      * Compare two CSV files and return differences
+     * @param target1 - First target to compare
+     * @param target2 - Second target to compare
      * @returns Array of differences between CSV1 and CSV2
      */
-    compareCsv() {
-      if (!this.csv1 || !this.csv2) {
+    compareCsv(target1: Target, target2: Target) {
+      if (!this[target1] || !this[target2]) {
         return null;
       }
-      
-      const rows1 = this.csv1.split('\n');
-      const rows2 = this.csv2.split('\n');
+
+      // Set comparison info
+      this.comparisonInfo = { target1, target2 };
+
+      const rows1 = this[target1].split('\n');
+      const rows2 = this[target2].split('\n');
       
       const { headers, startIndex: startIndex1 } = this.getValidHeaders(rows1);
       const { startIndex: startIndex2 } = this.getValidHeaders(rows2);
@@ -105,30 +123,36 @@ export const useStore = defineStore('store', {
     
     /**
      * Get the intersection between two CSV files
+     * @param target1 - First target to compare
+     * @param target2 - Second target to compare
      * @returns Array of rows common to both CSV files
      */
-    getIntersection() {
-      if (!this.csv1 || !this.csv2) {
+    getIntersection(target1: Target, target2: Target) {
+      if (!this[target1] || !this[target2]) {
         return null;
       }
-      
-      const rows1 = this.csv1.split('\n');
-      const rows2 = this.csv2.split('\n');
-      
+
+      const rows1 = this[target1].split('\n');
+      const rows2 = this[target2].split('\n');
+
       const { headers, startIndex: startIndex1 } = this.getValidHeaders(rows1);
       const { startIndex: startIndex2 } = this.getValidHeaders(rows2);
-      
+
       // Extract data without headers
       const data1 = rows1.slice(startIndex1).filter(row => row.trim());
       const data2 = rows2.slice(startIndex2).filter(row => row.trim());
-      
-      // Find rows that exist in both CSVs
+
+      // Find rows in csv1 that exist in csv2
       const intersection = data1.filter(row1 => data2.some(row2 => row1 === row2));
-      
+
       return {
         headers,
         intersection
       };
+    },
+    setSelectedTargets(target1: Target, target2: Target) {
+      this.selectedTargets = { target1, target2 };
+      this.comparisonInfo = { target1, target2 };
     }
   }
 })

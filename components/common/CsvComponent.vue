@@ -13,12 +13,15 @@ const { table, filterColumnKey } = useCsvTable(props.csvData);
 </script>
 
 <template>
-  <div class="w-full">
-    <div class="flex gap-2 items-center py-4">
+  <div v-if="csvData" class="w-full">
+    <div class="flex items-center justify-between py-4">
       <CsvFilterInput :table="table" :filter-column-key="filterColumnKey" />
       <CsvColumnVisibilityDropdown :table="table" />
     </div>
     <CsvTable :table="table" />
     <CsvPaginationControls :table="table" />
+  </div>
+  <div v-else class="text-center text-gray-500">
+    No data available
   </div>
 </template>
